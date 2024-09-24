@@ -13,34 +13,64 @@
     Return the length of the longest common prefix among all pairs. If no common prefix exists among them, return 0.
 """
 
-def get_common_prefix_length(a, b):
-    # Convert the integers to strings to compare digit by digit
-    a_str, b_str = str(a), str(b)
-    i = 0
-    # Compare the characters at each position
-    while i < len(a_str) and i < len(b_str) and a_str[i] == b_str[i]:
-        i += 1
-    return i
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end = False
 
-def longest_common_prefix(arr1, arr2):
-    max_prefix_length = 0
-    
-    # Iterate over all pairs (x, y) where x is from arr1 and y is from arr2
-    for x in arr1:
-        for y in arr2:
-            # Get the common prefix length between x and y
-            prefix_length = get_common_prefix_length(x, y)
-            # Update the maximum prefix length
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, num_str):
+        node = self.root
+        for char in num_str:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end = True
+
+    def find_longest_prefix(self, num_str):
+        node = self.root
+        length = 0
+        for char in num_str:
+            if char in node.children:
+                length += 1
+                node = node.children[char]
+            else:
+                break
+        return length
+
+class Solution(object):
+    def longestCommonPrefix(self, arr1, arr2):
+        trie = Trie()
+
+        # Insert all numbers from arr2 into the trie
+        for num in arr2:
+            trie.insert(str(num))
+        
+        max_prefix_length = 0
+
+        # Find the longest common prefix for each number in arr1
+        for num in arr1:
+            prefix_length = trie.find_longest_prefix(str(num))
             max_prefix_length = max(max_prefix_length, prefix_length)
-    
-    return max_prefix_length
+
+        return max_prefix_length
+
 
 # Example 1:
+solution = Solution()
 arr1 = [1, 10, 100]
 arr2 = [1000]
-print(longest_common_prefix(arr1, arr2))  # Output: 3
+print(solution.longestCommonPrefix(arr1, arr2))  # Output: 3
 
 # Example 2:
 arr1 = [1, 2, 3]
 arr2 = [4, 4, 4]
-print(longest_common_prefix(arr1, arr2))  # Output: 0
+print(solution.longestCommonPrefix(arr1, arr2))  # Output: 0
+
+# Example 3:
+arr1 = [123, 456, 789]
+arr2 = [12345, 45678, 78901]
+print(solution.longestCommonPrefix(arr1, arr2))  # Output: 3
